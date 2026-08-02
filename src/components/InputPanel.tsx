@@ -31,18 +31,37 @@ export function InputPanel({ plan, issues, onChange, onAddEvent, onAddChild }: P
       </Section>
 
       <Section title="収支（月額・現在価値）">
-        <Field label="就労中の手取り収入" error={err('monthlyIncome')}>
+        <Field
+          label="就労中の手取り収入"
+          error={err('monthlyIncome')}
+          hint="インフレ率で名目上昇（実質一定）"
+        >
           <ManYen valueYen={plan.monthlyIncome} onChangeYen={(v) => onChange({ monthlyIncome: v })} step={1} />
         </Field>
-        <Field label="生活費" error={err('monthlyLivingCost')}>
+        <Field
+          label="退職後の収入（サイドFIRE等）"
+          error={err('monthlyPostRetireIncome')}
+          hint="副業・パート等。0 なら退職後は収入なし。インフレ連動"
+        >
+          <ManYen
+            valueYen={plan.monthlyPostRetireIncome}
+            onChangeYen={(v) => onChange({ monthlyPostRetireIncome: v })}
+            step={1}
+          />
+        </Field>
+        <Field label="生活費" error={err('monthlyLivingCost')} hint="インフレ率で名目上昇（実質一定）">
           <ManYen valueYen={plan.monthlyLivingCost} onChangeYen={(v) => onChange({ monthlyLivingCost: v })} step={1} />
         </Field>
-        <Field label="うち積立投資（参考）" error={err('monthlyInvestment')} hint="計算は収入−生活費を貯蓄として扱います">
-          <ManYen valueYen={plan.monthlyInvestment} onChangeYen={(v) => onChange({ monthlyInvestment: v })} step={1} />
-        </Field>
         <p className="field-note">
-          毎月の貯蓄目安:{' '}
+          就労中の貯蓄目安:{' '}
           <strong>{formatYen(plan.monthlyIncome - plan.monthlyLivingCost)}</strong>
+          {plan.monthlyPostRetireIncome > 0 && (
+            <>
+              {' '}
+              ／ 退職後の収支目安:{' '}
+              <strong>{formatYen(plan.monthlyPostRetireIncome - plan.monthlyLivingCost)}</strong>
+            </>
+          )}
         </p>
       </Section>
 

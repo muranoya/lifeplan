@@ -11,9 +11,9 @@ import type { PlanInput, SimulationResult, YearSnapshot } from './types'
  * - 内部は月次で投影し、年次スナップショットに集約する
  * - 各月: 資産 += 収入 − 生活費 + イベント → 正の残高に月次リターンを適用
  * - 正の運用益に investmentTaxRate を課税し、税引き後を資産に加算
- * - 生活費は毎年インフレ率で上昇（複利）
- * - 就労中: monthlyIncome を収入、退職後は 0
- * - 積立額フィールドは UI 参考値。計算上の貯蓄は 収入 − 生活費
+ * - 生活費・収入は毎年インフレ率で名目上昇（複利、実質一定）
+ * - 就労中: monthlyIncome、退職後: monthlyPostRetireIncome（いずれも現在価値×インフレ）
+ * - 貯蓄 = 収入 − 生活費 + イベント
  * - FIRE: 期末資産 ≧ その年の年間生活費 / safeWithdrawalRate の最初の年齢
  * - 所得税（給与）・社会保険・公的年金は考慮しない
  */
@@ -48,7 +48,8 @@ export function simulate(plan: PlanInput): SimulationResult {
     let yearTax = 0
 
     for (let m = 0; m < 12; m++) {
-      const mIncome = retired ? 0 : plan.monthlyIncome
+      const baseIncome = retired ? plan.monthlyPostRetireIncome : plan.monthlyIncome
+      const mIncome = baseIncome * inflationFactor
       const mOneTime = m === 0 ? oneTime : 0
       const mEducation = m === 0 ? education : 0
 

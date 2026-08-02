@@ -101,6 +101,7 @@ describe('simulate', () => {
     plan.retireAge = 60
     plan.endAge = 45
     plan.monthlyIncome = 500_000
+    plan.monthlyPostRetireIncome = 0
     plan.monthlyLivingCost = 100_000
     plan.annualInflationRate = 0
     plan.lifeEvents = [
@@ -112,6 +113,41 @@ describe('simulate', () => {
     expect(at34.retired).toBe(false)
     expect(at35.retired).toBe(true)
     expect(at35.income).toBe(0)
+  })
+
+  it('applies post-retire side income after retirement', () => {
+    const plan = createDefaultPlan()
+    plan.currentAge = 50
+    plan.retireAge = 50
+    plan.endAge = 52
+    plan.currentAssets = 0
+    plan.monthlyIncome = 500_000
+    plan.monthlyPostRetireIncome = 100_000
+    plan.monthlyLivingCost = 0
+    plan.annualReturnRate = 0
+    plan.annualInflationRate = 0
+    const result = simulate(plan)
+    const y50 = result.yearly.find((y) => y.age === 50)!
+    expect(y50.retired).toBe(true)
+    expect(y50.income).toBe(100_000 * 12)
+    expect(y50.assets).toBe(100_000 * 12)
+  })
+
+  it('inflates income with annual inflation rate', () => {
+    const plan = createDefaultPlan()
+    plan.currentAge = 30
+    plan.retireAge = 65
+    plan.endAge = 32
+    plan.currentAssets = 0
+    plan.monthlyIncome = 100_000
+    plan.monthlyLivingCost = 0
+    plan.annualReturnRate = 0
+    plan.annualInflationRate = 0.1
+    const result = simulate(plan)
+    const y0 = result.yearly.find((y) => y.age === 30)!
+    const y1 = result.yearly.find((y) => y.age === 31)!
+    expect(y0.income).toBe(100_000 * 12)
+    expect(y1.income).toBe(Math.round(100_000 * 1.1 * 12))
   })
 
   it('taxes positive investment returns', () => {
@@ -154,14 +190,43 @@ describe('serialize', () => {
   it('round-trips export and import', () => {
     const plan = createDefaultPlan()
     plan.monthlyLivingCost = 333_000
+    plan.monthlyPostRetireIncome = 80_000
     plan.children = [createChild({ currentAge: 5 })]
     const json = exportPlan(plan)
     const result = importPlanJson(json)
     expect(result.ok).toBe(true)
     if (result.ok) {
       expect(result.plan.monthlyLivingCost).toBe(333_000)
+      expect(result.plan.monthlyPostRetireIncome).toBe(80_000)
       expect(result.plan.children).toHaveLength(1)
       expect(result.plan.children[0].currentAge).toBe(5)
+    }
+  })
+
+  it('defaults missing post-retire income on import', () => {
+    const result = importPlanJson(
+      JSON.stringify({
+        schemaVersion: 1,
+        plan: {
+          currentAge: 30,
+          currentAssets: 1_000_000,
+          monthlyLivingCost: 200_000,
+          monthlyIncome: 400_000,
+          retireAge: 45,
+          endAge: 90,
+          annualReturnRate: 0.05,
+          annualInflationRate: 0.02,
+          hasSpouse: false,
+          children: [],
+          lifeEvents: [],
+          safeWithdrawalRate: 0.04,
+          investmentTaxRate: 0.20315,
+        },
+      }),
+    )
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.plan.monthlyPostRetireIncome).toBe(0)
     }
   })
 

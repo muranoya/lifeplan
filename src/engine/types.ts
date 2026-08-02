@@ -38,17 +38,20 @@ export interface PlanInput {
   currentAssets: number
   /** 毎月の生活費（円、現在価値） */
   monthlyLivingCost: number
-  /** 毎月の就労収入（手取り想定、円） */
+  /** 毎月の就労収入（手取り想定、円、現在価値） */
   monthlyIncome: number
-  /** 毎月の積立投資額（円）。収入に含まれる想定で、資産へ加算する額 */
-  monthlyInvestment: number
+  /**
+   * 退職後の月次収入（手取り想定、円、現在価値）。
+   * サイドFIRE・副業・パート等。0 なら退職後は収入なし
+   */
+  monthlyPostRetireIncome: number
   /** 退職（FIRE）予定年齢 */
   retireAge: number
   /** シミュレーション終了年齢 */
   endAge: number
   /** 年間期待リターン（例: 0.05 = 5%） */
   annualReturnRate: number
-  /** 年間インフレ率（生活費上昇、例: 0.02 = 2%） */
+  /** 年間インフレ率（生活費・収入の名目上昇、例: 0.02 = 2%） */
   annualInflationRate: number
   /** 配偶者あり */
   hasSpouse: boolean
@@ -118,7 +121,7 @@ export interface ScenarioOverride {
       | 'retireAge'
       | 'monthlyLivingCost'
       | 'monthlyIncome'
-      | 'monthlyInvestment'
+      | 'monthlyPostRetireIncome'
       | 'annualReturnRate'
       | 'annualInflationRate'
       | 'investmentTaxRate'

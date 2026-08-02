@@ -23,7 +23,8 @@ const OVERRIDE_FIELDS: {
 }[] = [
   { key: 'retireAge', label: '退職年齢', kind: 'age' },
   { key: 'monthlyLivingCost', label: '生活費（月）', kind: 'man' },
-  { key: 'monthlyIncome', label: '収入（月）', kind: 'man' },
+  { key: 'monthlyIncome', label: '就労収入（月）', kind: 'man' },
+  { key: 'monthlyPostRetireIncome', label: '退職後収入（月）', kind: 'man' },
   { key: 'currentAssets', label: '金融資産', kind: 'man' },
   { key: 'annualReturnRate', label: 'リターン', kind: 'percent' },
   { key: 'annualInflationRate', label: 'インフレ', kind: 'percent' },
@@ -230,7 +231,9 @@ function OverrideHint({ scenario }: { scenario: ScenarioOverride }) {
   const parts: string[] = []
   if (o.retireAge !== undefined) parts.push(`退職 ${o.retireAge}歳`)
   if (o.monthlyLivingCost !== undefined) parts.push(`生活費 ${formatYen(o.monthlyLivingCost)}`)
-  if (o.monthlyIncome !== undefined) parts.push(`収入 ${formatYen(o.monthlyIncome)}`)
+  if (o.monthlyIncome !== undefined) parts.push(`就労収入 ${formatYen(o.monthlyIncome)}`)
+  if (o.monthlyPostRetireIncome !== undefined)
+    parts.push(`退職後収入 ${formatYen(o.monthlyPostRetireIncome)}`)
   if (o.currentAssets !== undefined) parts.push(`資産 ${formatYen(o.currentAssets)}`)
   if (o.annualReturnRate !== undefined) parts.push(`リターン ${(o.annualReturnRate * 100).toFixed(1)}%`)
   if (o.annualInflationRate !== undefined) parts.push(`インフレ ${(o.annualInflationRate * 100).toFixed(1)}%`)

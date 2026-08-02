@@ -10,7 +10,7 @@ export function createDefaultPlan(): PlanInput {
     currentAssets: 5_000_000,
     monthlyLivingCost: 250_000,
     monthlyIncome: 400_000,
-    monthlyInvestment: 100_000,
+    monthlyPostRetireIncome: 0,
     retireAge: 45,
     endAge: 90,
     annualReturnRate: 0.05,

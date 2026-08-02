@@ -20,8 +20,11 @@ export function validatePlan(plan: PlanInput): ValidationIssue[] {
   if (!Number.isFinite(plan.monthlyIncome) || plan.monthlyIncome < 0) {
     issues.push({ path: 'monthlyIncome', message: '収入は 0 以上で入力してください' })
   }
-  if (!Number.isFinite(plan.monthlyInvestment) || plan.monthlyInvestment < 0) {
-    issues.push({ path: 'monthlyInvestment', message: '積立額は 0 以上で入力してください' })
+  if (!Number.isFinite(plan.monthlyPostRetireIncome) || plan.monthlyPostRetireIncome < 0) {
+    issues.push({
+      path: 'monthlyPostRetireIncome',
+      message: '退職後の収入は 0 以上で入力してください',
+    })
   }
   if (!Number.isFinite(plan.retireAge) || plan.retireAge < plan.currentAge) {
     issues.push({ path: 'retireAge', message: '退職年齢は現在の年齢以上にしてください' })
